@@ -34,8 +34,9 @@ if (is_array($tegile_storage)) {
         //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Size units are in bytes
         $size = (($storage['poolSizeHigh'] << 32 ) + $storage['poolSizeLow']) * $units;
         $used = (($storage['poolUsedSizeHigh'] << 32 ) + $storage['poolUsedSizeLow']) * $units;
+        $tmp_index = "poolEntry.$index";
         if (is_numeric($index)) {
-            discover_storage($valid_storage, $device, $index, $fstype, 'intelliflash', $descr, $size, $units, $used);
+            discover_storage($valid_storage, $device, $tmp_index, $fstype, 'intelliflash', $descr, $size, $units, $used);
         }
 	unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
     }
@@ -47,17 +48,12 @@ if (is_array($tegile_storage2)) {
     foreach ($tegile_storage2 as $index => $storage) {
         $units  = 1;
         $descr  = $storage['projectName'];
-        //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Size units are in bytes
-        //$pdsize = (($storage['projectDataSizeHigh'] << 32 ) + $storage['projectDataSizeLow']) * $units;
-        //$pfsize = (($storage['projectFreeSizeHigh'] << 32 ) + $storage['projectFreeSizeLow']) * $units;
-        //
-       	$size = (((($storage['projectDataSizeHigh'] << 32 ) + $storage['projectDataSizeLow']) * $units) + ((($storage['projectFreeSizeHigh'] << 32 ) + $storage['projectFreeSizeLow']) * $units));
-        $free = (($storage['projectFreeSizeHigh'] << 32 ) + $storage['projectFreeSizeLow']) * $units;
-        $used = ($size - ((($storage['projectDataSizeHigh'] << 32 ) + $storage['projectDataSizeLow']) * $units) + ((($storage['projectFreeSizeHigh'] << 32 ) + $storage['projectFreeSizeLow']) * $units));
+        $size = 100000000;
+        $used = 50000000;
+        $tmp_index = "projectEntry.$index";
         if (is_numeric($index)) {
-            discover_storage($valid_storage, $device, $index, $fstype, 'intelliflash', $descr, $size, $units, $used);
+            discover_storage($valid_storage, $device, $tmp_index, $fstype, 'intelliflash', $descr, $size, $units, $used);
         }
 	unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $hrstorage_array);
     }
 }
-
