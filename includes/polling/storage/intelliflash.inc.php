@@ -22,24 +22,36 @@
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  */
-if (!is_array($storage_cache['tegile'])) {
-    $storage_cache['tegile'] = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
+if (!is_array($storage_cache['intelliflash'])) {
+    $storage_cache['intelliflash'] = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
     d_echo($storage_cache);
 }
-$entry = $storage_cache['tegile'][$storage[storage_index]];
+$entry = $storage_cache['intelliflash'][$storage[storage_index]];
 $storage['units'] = 1;
 //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
 $storage['size'] = (($entry['poolSizeHigh'] << 32 ) + $entry['poolSizeLow']) * $storage['units'];
 $storage['used'] = (($entry['poolUsedSizeHigh'] << 32 ) + $entry['poolUsedSizeLow']) * $storage['units'];
 $storage['free'] = ($storage['size'] - $storage['used']);
 
-if (!is_array($storage_cache['tegile2'])) {
-    $storage_cache['tegile2'] = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB');
+//  
+if (!is_array($storage_cache['intelliflash2'])) {
+    $storage_cache['intelliflash2'] = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB');
     d_echo($storage_cache);
 }
-$entry = $storage_cache['tegile2'][$storage[storage_index]];
-$storage['units'] = 1;
+$entry = $storage_cache['intelliflash2'][$storage[storage_index]];
+$storage['units2'] = 1;
 //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
-$storage['size'] = (($entry['projectDataSizeHigh'] << 32 ) + $entry['projectDataSizeLow']) * $storage['units'];
-$storage['free'] = (($entry['projectFreeSizeHigh'] << 32 ) + $entry['projectFreeSizeLow']) * $storage['units'];
-$storage['used'] = (storage['size'] - $storage['free']);
+//$pdsize = (($storage['projectDataSizeHigh'] << 32 ) + $storage['projectDataSizeLow']) * $units;
+//$pfsize       = (($storage['projectFreeSizeHigh'] << 32 ) + $storage['projectFreeSizeLow']) * $units;
+//$size = ($pdsize + $pfsize);
+//$free = (($storage['projectFreeSizeHigh'] << 32 ) + $storage['projectFreeSizeLow']) * $units;
+//$used = ($size - $pdsize);
+//
+$storage['size'] = (((($entry['projectDataSizeHigh'] << 32 ) + $entry['projectDataSizeLow']) * $units) + ((($entry['projectFreeSizeHigh'] << 32 ) + $entry['projectFreeSizeLow']) * $storage['units']));
+$storage['free'] = (($entry['projectFreeSizeHigh'] << 32 ) + $entry['projectFreeSizeLow']) * $storage['units2'];
+$storage['used'] = ($storage['size'] - ((($entry['projectDataSizeHigh'] << 32 ) + $entry['projectDataSizeLow']) * $units) + ((($entry['projectFreeSizeHigh'] << 32 ) + $entry['projectFreeSizeLow']) * $torage[$
+//
+//$storage['size'] = (($entry['projectDataSizeHigh'] << 32 ) + $entry['projectDataSizeLow']) * $storage['units2'];
+//$storage['free'] = (($entry['projectFreeSizeHigh'] << 32 ) + $entry['projectFreeSizeLow']) * $storage['units2'];
+//$storage['used'] = (storage['size2'] - $storage['free2']);
+//*/
