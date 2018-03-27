@@ -1,28 +1,4 @@
 <?php
-/**
- * tegile.inc.php
- *
- * LibreNMS storage polling module for Tegile Storage
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    LibreNMS
- * @link       http://librenms.org
- * @copyright  2018 Ryan Finney
- * @author     https://github.com/theherodied/
- */
-
 if (!is_array($storage_cache['intelliflash'])) {
     $storage_cache['intelliflash'] = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
     d_echo($storage_cache);
@@ -35,16 +11,64 @@ $storage['size'] = (($entry['poolSizeHigh'] << 32 ) + $entry['poolSizeLow']) * $
 $storage['used'] = (($entry['poolUsedSizeHigh'] << 32 ) + $entry['poolUsedSizeLow']) * $storage['units'];
 $storage['free'] = ($storage['size'] - $storage['used']);
 
-/**
-if (!is_array($storage_cache['intelliflash'])) {
-    $storage_cache['intelliflash2'] = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
-    d_echo($storage_cache);
+
+
+if (!is_array($storage_cache1['intelliflash'])) {
+    $storage_cache1['eql-storage'] = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
+    d_echo($storage_cache1);
 }
-//$tmp_index = "projectEntry.$index";
-$entry = $storage_cache['intelliflash'][$storage[storage_index]];
-$storage['units'] = 1;
+if (!is_array($storage_cache2['intelliflash'])) {
+    $storage_cache2['eql-storage'] = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB');
+    d_echo($storage_cache2);
+}
+$iind = 0;
+$storage_cache10 = array();
+$storage_cache20 = array();
+
+d_echo($storage);
+foreach ($storage_cache1['intelliflash'] as $index => $poentry) {
+    if (!array_key_exists('poolName', $poentry)) {
+        continue;
+    }
+    if (is_int($index)) {
+        $iind = $index;
+    } else {
+        $arrindex = explode(".", $index);
+        $iind = (int)(end($arrindex))+0;
+    }
+    if (is_int($iind)) {
+        $storage_cache10[$iind] = $poentry;
+    }
+}
+$entry1 = $storage_cache10[$storage[storage_index]];
+
+$storage['units1'] = 1;
+//Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
+$storage['size'] = (($entry1['poolSizeHigh'] << 32 ) + $entry1['poolSizeLow']) * $storage['units1'];
+$storage['used'] = (($entry1['poolUsedSizeHigh'] << 32 ) + $entry1['poolUsedSizeLow']) * $storage['units1'];
+$storage['free'] = ($storage['size'] - $storage['used']);
+
+
+d_echo($storage_cache10);
+
+foreach ($storage_cache2['intelliflash'] as $index => $prentry) {
+    if (!array_key_exists('projectName', $prentry)) {
+        continue;
+    }
+    if (is_int($index)) {
+        $iind = $index;
+    } else {
+        $arrindex = explode(".", $index);
+        $iind = (int)(end($arrindex))+0;
+    }
+    if (is_int($iind)) {
+        $storage_cache20[$iind] = $prentry;
+    }
+}
+d_echo($storage_cache20);
+
+$entry2 = $storage_cache20[$storage[storage_index]];
 //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
 $storage['size'] = 100000000;
 $storage['used'] = 50000000;
 $storage['free'] = ($storage['size'] - $storage['used']);
-*/
