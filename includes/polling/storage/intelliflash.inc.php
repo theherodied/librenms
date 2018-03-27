@@ -1,25 +1,11 @@
 <?php
-if (!is_array($storage_cache['intelliflash'])) {
-    $storage_cache['intelliflash'] = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
-    d_echo($storage_cache);
-}
-//$tmp_index = "poolEntry.$index";
-$entry = $storage_cache['intelliflash'][$storage[storage_index]];
-$storage['units'] = 1;
-//Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.
-$storage['size'] = (($entry['poolSizeHigh'] << 32 ) + $entry['poolSizeLow']) * $storage['units'];
-$storage['used'] = (($entry['poolUsedSizeHigh'] << 32 ) + $entry['poolUsedSizeLow']) * $storage['units'];
-$storage['free'] = ($storage['size'] - $storage['used']);
-
-
-
 if (!is_array($storage_cache1['intelliflash'])) {
-    $storage_cache1['eql-storage'] = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
-    d_echo($storage_cache1);
+    $storage_cache1['intelliflash'] = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
+    #d_echo($storage_cache1);
 }
 if (!is_array($storage_cache2['intelliflash'])) {
-    $storage_cache2['eql-storage'] = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB');
-    d_echo($storage_cache2);
+    $storage_cache2['intelliflash'] = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB');
+    #d_echo($storage_cache2);
 }
 $iind = 0;
 $storage_cache10 = array();
@@ -48,7 +34,7 @@ $storage['size'] = (($entry1['poolSizeHigh'] << 32 ) + $entry1['poolSizeLow']) *
 $storage['used'] = (($entry1['poolUsedSizeHigh'] << 32 ) + $entry1['poolUsedSizeLow']) * $storage['units1'];
 $storage['free'] = ($storage['size'] - $storage['used']);
 
-
+/**
 d_echo($storage_cache10);
 
 foreach ($storage_cache2['intelliflash'] as $index => $prentry) {
