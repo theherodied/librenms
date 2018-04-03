@@ -1,6 +1,6 @@
 <?php
 /**
- * Hiveos-Wireless.php
+ * HiveosWireless.php
  *
  * AeroHive Hiveos-Wireless
  *
@@ -19,8 +19,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2018 Ryan Finney
+ * @author     https://github.com/theherodied/
  */
 
 namespace LibreNMS\OS;
@@ -28,25 +28,14 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
-use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 
 class HiveosWireless extends OS implements
     WirelessClientsDiscovery,
-    WirelessFrequencyDiscovery,
-    WirelessFrequencyPolling,
-    WirelessNoiseFloorDiscovery,
-    WirelessUtilizationDiscovery,
-    WirelessRateDiscovery,
-    WirelessRssiDiscovery,
-    WirelessSnrDiscovery
+    WirelessFrequencyDiscovery
 {
     /**
+     * Discover wireless client counts. Type is clients.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors
@@ -55,10 +44,9 @@ class HiveosWireless extends OS implements
     {
         $oid = '.1.3.6.1.4.1.26928.1.2.9.0'; // AH-SYSTEM-MIB::ahClientCount
         return array(
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'hiveos-wireless', 0, 'Clients'),
+            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'HiveosWireless', 1, 'Clients')
         );
     }
-
     /**
      * Discover wireless frequency.  This is in MHz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -67,55 +55,9 @@ class HiveosWireless extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        return $this->discoverSensor('frequency', 'ahRadioChannel', '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1.');
-    }
-
-    /**
-     * Poll wireless frequency as MHz
-     * The returned array should be sensor_id => value pairs
-     *
-     * @param array $sensors Array of sensors needed to be polled
-     * @return array of polled data
-     */
-    public function pollWirelessFrequency(array $sensors)
-    {
-        return $this->pollWirelessChannelAsFrequency($sensors);
-    }
-
-    /**
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array
-     */
-    public function discoverWirelessNoiseFloor()
-    {
-        return $this->discoverSensor('noise-floor', 'ahRadioNoiseFloor', '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.3.');
-    }
-
-    /**
-     * Discover wireless rate. This is in bps. Type is rate.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array
-     */
-    public function discoverWirelessRate()
-    {
-        $tx_oid = '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.1'; //AH-INTERFACE-MIB::ahRadioTxDataFrames
-        $rx_oid = '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.11'; //AH-INTERFACE-MIB::ahRadioRxTotalDataFrames
+     	$oid = '.1.3.6.1.4.1.26928.1.1.1.2.1.5.1.1'; // AH-INTERFACE-MIB::ahRadioChannel
         return array(
-            new WirelessSensor('rate', $this->getDeviceId(), $tx_oid, 'hiveos-tx', 1, 'Tx Rate'),
-            new WirelessSensor('rate', $this->getDeviceId(), $rx_oid, 'hiveos-rx', 1, 'Rx Rate'),
+            new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'HiveosWireless', 1, 'Radio Frequency')
         );
-    }
-
-    /**
-     * Discover wireless RSSI (Received Signal Strength Indicator). This is in dBm. Type is rssi.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array
-     */
-    public function discoverWirelessRssi()
-    {
-        return $this->discoverSensor('rssi', 'ahClientRSSI', '.1.3.6.1.4.1.26928.1.1.1.2.1.2.1.4.');
     }
 }
