@@ -34,6 +34,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessAirTimeDiscovery;
 
 class HiveosWireless extends OS implements
     WirelessClientsDiscovery,
@@ -41,6 +42,7 @@ class HiveosWireless extends OS implements
     WirelessFrequencyPolling,
     WirelessNoiseFloorDiscovery,
     WirelessPowerDiscovery,
+    WirelessAirTimeDiscovery,
     ProcessorDiscovery
 {
     /**
@@ -149,4 +151,45 @@ class HiveosWireless extends OS implements
         }
         return $sensors;
     }
+
+
+
+
+
+    public function discoverWirelessAirTime()
+    {
+     	$sensors = array();
+
+        $ahRadioName = $this->getCacheByIndex('ahIfName', 'AH-INTERFACE-MIB');
+       	$ahAirTime = snmpwalk_group($this->getDevice(), 'ahRadioTxAirtime', 'AH-INTERFACE-MIB');
+       	$ahAirTime = snmpwalk_group($this->getDevice(), 'ahRadioRxAirtime', 'AH-INTERFACE-MIB');
+        foreach ($ahAirTime as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'power',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.22.' . $index,
+                'hiveos-wireless',
+                $index,
+                'Tx AirTime: ' . $ahRadioName[$index],
+                $entry['ahRadioTxAirTime']
+            );
+            $sensors[] = new WirelessSensor(
+                'power',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.26928.1.1.1.2.1.3.1.23.' . $index,
+                'hiveos-wireless',
+                $index,
+                'Rx AirTime: ' . $ahRadioName[$index],
+                $entry['ahRadioRxAirTime']
+            );
+	}
+	return $sensors;
+    }
+
+
+
+            
+
+
 }
+
